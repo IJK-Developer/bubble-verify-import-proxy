@@ -23,8 +23,19 @@ app.post("/bubble-verify-import-proxy", async (req, res) => {
     });
     res.json(response.data); // Send Shopify response back to frontend
   } catch (error) {
-    console.error("Error:", error.response?.data || error.message);
-    res.status(500).json({ error: "Failed to connect to Shopify API." });
+    // Log detailed error info and raw HTML response body if possible
+    console.error("Error:", error.response?.status, error.response?.data || error.message);
+
+    // Log the raw HTML (if it’s an HTML error page, you’ll see it here)
+    if (error.response?.data) {
+      console.error("Raw response body:", error.response.data);
+    }
+
+    // Send an error response to the frontend
+    res.status(500).json({
+      error: "Failed to connect to Shopify API.",
+      details: error.response?.data || error.message, // Sending error details for debugging
+    });
   }
 });
 
